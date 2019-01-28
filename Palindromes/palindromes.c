@@ -115,14 +115,13 @@ int main(int argc, char *argv[]){
     pthread_join(workerid[l],NULL);
   }
   double end = read_timer();
-  for(int i =0; i<MAXWORKERS;i++){
+  for(int i =0; i<numWorkers;i++){
     total = total + counter[i];
     printf("Worker %d is done with %d counted\n", i,counter[i]);
 
   }
   printf("TOTAL: %d\n", total);
   printf("Execution time: %f sec\n", end-start);
-
   printf("DONE\n");
 
   //pthread_exit(NULL);
