@@ -25,7 +25,6 @@ struct word_struct{
   string word;
 };
 
-int total_time = 0;
 int numWorkers;
 int listSize;
 int counter[MAXWORKERS];
@@ -49,6 +48,24 @@ double read_timer() {
     return (end.tv_sec - start.tv_sec) + 1.0e-6 * (end.tv_usec - start.tv_usec);
 }
 
+int symbol(string currentWord){
+  for(int i = 0; i<currentWord.length();i++){
+    if(currentWord.at(i) == 39){
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
+string sanitize (string currentWord){
+  string new_string = "";
+  for(int i = 0; i<currentWord.length();i++){
+    if(currentWord.at(i) != 39){
+      new_string += currentWord.at(i);
+    }
+  }
+  return new_string;
+}
 /* for finding single word palindromes */
 int palindromic(string word){
   int boolean = TRUE;
@@ -71,9 +88,19 @@ int binarySearch(string word, struct word_struct words[]){
   double high = WORDCOUNT-1;
   string currentWord;
   int index;
+
+
   while(low <= high){
     index = floor((low+high)/2);
-    currentWord = words[index].word;
+    string non_sanitized = words[index].word;
+    if(symbol(words[index].word) == TRUE){
+      currentWord = sanitize(words[index].word);
+    }
+    else{
+      currentWord = words[index].word;
+    }
+
+
     int compared = strcasecmp(copy.c_str(), currentWord.c_str());
     if(compared < 0){
         high = index-1;
@@ -81,10 +108,11 @@ int binarySearch(string word, struct word_struct words[]){
     else if(compared > 0){
       low = index+1;
     }
-    else{
+    else if(compared == 0 && 0==strcasecmp(non_sanitized.c_str(), currentWord.c_str())){
         boolean = TRUE;
         break;
       }
+      else low++;
   }
   return boolean;
 }
@@ -128,11 +156,11 @@ int main(int argc, char *argv[]){
   double end = read_timer();
   for(int i =0; i<numWorkers;i++){
     total = total + counter[i];
-  //  printf("Worker %d is done with %d counted\n", i,counter[i]);
+    printf("Worker %d is done with %d counted\n", i,counter[i]);
 
   }
-  //printf("TOTAL: %d\n", total);
-  printf("%f\n", end-start);
+  printf("TOTAL: %d\n", total);
+  printf("Execution time: %f sec\n", end-start);
 
   //printf("PALINDROMES:\n");
   for(int i = 0; i<WORDCOUNT-1;i++){
@@ -142,7 +170,7 @@ int main(int argc, char *argv[]){
     }
   }
 
-  //printf("DONE\n");
+  printf("DONE\n");
 
   //pthread_exit(NULL);
 }
