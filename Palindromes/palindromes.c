@@ -148,6 +148,7 @@ int main(int argc, char *argv[]){
 
   double start = read_timer();
   for (int l = 0; l < numWorkers; l++){
+    //counter[l] = 0;
     pthread_create(&workerid[l], &attr, findPalindromes, (void *) l);
   }
   for (int l = 0; l < numWorkers; l++){
@@ -159,17 +160,20 @@ int main(int argc, char *argv[]){
     printf("Worker %d is done with %d counted\n", i,counter[i]);
 
   }
+
   printf("TOTAL: %d\n", total);
-  printf("Execution time: %f sec\n", end-start);
 
   //printf("PALINDROMES:\n");
+  total = 0;
   for(int i = 0; i<WORDCOUNT-1;i++){
     if(words[i].palindrome){
     //  printf("%s\n",words[i].word.c_str());
+      total++;
       writeFile << words[i].word+"\n";
     }
   }
-
+  printf("TOTAL: %d\n", total);
+  printf("Execution time: %f sec\n", end-start);
   printf("DONE\n");
 
   //pthread_exit(NULL);
@@ -178,10 +182,14 @@ int main(int argc, char *argv[]){
 void *findPalindromes(void *arg){
   int mycounter = 0;
   int myid = (long)arg;
-  int strip = listSize*myid;
-  //printf("worker %d (pthread id %d) has started\n", myid, pthread_self());
+  int end;
+  if(myid == numWorkers-1){
+    end = WORDCOUNT-1;
+  }
+  else end = (myid+1)*listSize;
+  int start = listSize*myid;
 
-  for(int i = listSize*myid; i<listSize*(myid+1);i++){
+  for(int i = start; i<end;i++){
 
     if(palindromic(words[i].word)==TRUE){
     //  printf("ONE WORD: %s, %d\n ",words[i].c_str(),myid);
