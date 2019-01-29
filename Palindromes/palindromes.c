@@ -18,13 +18,23 @@ using namespace std;
 #define MAXWORKERS 10   /* maximum number of workers */
 #define TRUE 1
 #define FALSE 0
+#define LOOPS 10
 
+struct word_struct{
+  int palindrome;
+  string word;
+};
+
+int total_time = 0;
 int numWorkers;
 int listSize;
 int counter[MAXWORKERS];
-string words[WORDCOUNT];
 pthread_mutex_t counter_lock;
+pthread_mutex_t words_lock;
+
 ofstream writeFile;
+struct word_struct words[WORDCOUNT];
+
 
 double read_timer() {
     static bool initialized = false;
@@ -53,7 +63,7 @@ int palindromic(string word){
 
 
 
-int binarySearch(string word, string words[]){
+int binarySearch(string word, struct word_struct words[]){
   string copy = word;
   reverse(copy.begin(),copy.end());
   int boolean = FALSE;
@@ -63,7 +73,7 @@ int binarySearch(string word, string words[]){
   int index;
   while(low <= high){
     index = floor((low+high)/2);
-    currentWord = words[index];
+    currentWord = words[index].word;
     int compared = strcasecmp(copy.c_str(), currentWord.c_str());
     if(compared < 0){
         high = index-1;
@@ -83,6 +93,7 @@ void *findPalindromes(void *);
 int main(int argc, char *argv[]){
   pthread_t workerid[MAXWORKERS];
   pthread_mutex_init(&counter_lock, NULL);
+  pthread_mutex_init(&words_lock, NULL);
   int total = 0;
   pthread_attr_t attr;
 
@@ -103,7 +114,7 @@ int main(int argc, char *argv[]){
   inFile.open("words");
     for (int i = 0; i < WORDCOUNT-1; i++)
     {
-      inFile >> words[i];
+      inFile >> words[i].word;
     }
   inFile.close();
 
@@ -117,19 +128,24 @@ int main(int argc, char *argv[]){
   double end = read_timer();
   for(int i =0; i<numWorkers;i++){
     total = total + counter[i];
-    printf("Worker %d is done with %d counted\n", i,counter[i]);
+  //  printf("Worker %d is done with %d counted\n", i,counter[i]);
 
   }
-  printf("TOTAL: %d\n", total);
-  printf("Execution time: %f sec\n", end-start);
-  printf("DONE\n");
+  //printf("TOTAL: %d\n", total);
+  printf("%f\n", end-start);
+
+  //printf("PALINDROMES:\n");
+  for(int i = 0; i<WORDCOUNT-1;i++){
+    if(words[i].palindrome){
+    //  printf("%s\n",words[i].word.c_str());
+      writeFile << words[i].word+"\n";
+    }
+  }
+
+  //printf("DONE\n");
 
   //pthread_exit(NULL);
 }
-void Barrier(){
-
-}
-
 
 void *findPalindromes(void *arg){
   int mycounter = 0;
@@ -138,19 +154,16 @@ void *findPalindromes(void *arg){
   //printf("worker %d (pthread id %d) has started\n", myid, pthread_self());
 
   for(int i = listSize*myid; i<listSize*(myid+1);i++){
-    if(palindromic(words[i])==TRUE){
+
+    if(palindromic(words[i].word)==TRUE){
     //  printf("ONE WORD: %s, %d\n ",words[i].c_str(),myid);
-      pthread_mutex_lock(&counter_lock);
       counter[myid]++;
-      writeFile << words[i]+"\n";
-      pthread_mutex_unlock(&counter_lock);
+      words[i].palindrome = TRUE;
     }
-    else if(binarySearch(words[i],words) == TRUE){
+    else if(binarySearch(words[i].word,words) == TRUE){
     //  printf("TWO WORD: %s, %d\n",words[i].c_str(),myid);
-      pthread_mutex_lock(&counter_lock);
       counter[myid]++;
-      writeFile << words[i]+"\n";
-      pthread_mutex_unlock(&counter_lock);
+      words[i].palindrome = TRUE;
     }
   }
 }
