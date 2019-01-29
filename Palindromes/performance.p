@@ -9,4 +9,4 @@ set xlabel "Amount of Threads"
 set ylabel "Time in seconds"
 
 
-plot "performance.dat" u 1:2 w linespoints title "time"
+plot "performance.dat" u 1:2 w linespoints title "Average time per amount of workers"
