@@ -22,7 +22,9 @@ using namespace std;
 
 struct word_struct{
   int palindrome;
+  int special;
   string word;
+  string sanitized;
 };
 
 int numWorkers;
@@ -93,8 +95,8 @@ int binarySearch(string word, struct word_struct words[]){
   while(low <= high){
     index = floor((low+high)/2);
     string non_sanitized = words[index].word;
-    if(symbol(words[index].word) == TRUE){
-      currentWord = sanitize(words[index].word);
+    if(words[index].special==TRUE){
+      currentWord = words[index].sanitized;
     }
     else{
       currentWord = words[index].word;
@@ -143,6 +145,13 @@ int main(int argc, char *argv[]){
     for (int i = 0; i < WORDCOUNT-1; i++)
     {
       inFile >> words[i].word;
+      if(symbol(words[i].word)==TRUE){
+        words[i].special = TRUE;
+        words[i].sanitized = sanitize(words[i].word);
+      }
+      else{
+        words[i].special = FALSE;
+      }
     }
   inFile.close();
 
@@ -157,11 +166,11 @@ int main(int argc, char *argv[]){
   double end = read_timer();
   for(int i =0; i<numWorkers;i++){
     total = total + counter[i];
-    printf("Worker %d is done with %d counted\n", i,counter[i]);
+    //printf("Worker %d is done with %d counted\n", i,counter[i]);
 
   }
 
-  printf("TOTAL: %d\n", total);
+//  printf("TOTAL: %d\n", total);
 
   //printf("PALINDROMES:\n");
   total = 0;

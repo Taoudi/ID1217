@@ -12,7 +12,7 @@
 #include <cstdio>
 #include <cctype>
 #include <cmath>
-#define SAMPLESIZE 10
+#define SAMPLESIZE 100
 #define SAMPLES 10
 
 using namespace std;
