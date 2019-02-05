@@ -1,7 +1,8 @@
 *.DS_Store
 a.out
 pal
-sum.dSYM/
+HW1/Matrix/sum.dSYM/
+HW1/Palindromes/pal.dSYM/
 sum
 pa
 pal1
