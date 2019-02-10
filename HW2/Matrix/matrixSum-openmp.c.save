@@ -1,3 +1,4 @@
+
 /* matrix summation using OpenMP
 
 gcc-8 -Wall -fopenmp your-parallel-program.c
