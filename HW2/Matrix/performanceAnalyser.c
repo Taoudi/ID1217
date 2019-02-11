@@ -12,30 +12,39 @@
 #include <cstdio>
 #include <cctype>
 #include <cmath>
-#define SAMPLESIZE 100
-#define SAMPLES 10
+#define SAMPLESIZE 3
+#define SAMPLES 8
 
 using namespace std;
 
 ofstream writeFile;
 ifstream inFile;
-
+double arr[SAMPLES][SAMPLESIZE];
+int comp (const void *e1, const void *e2){
+  double f = *((double*)e1);
+  double s = *((double*)e2);
+  if(f>s)return 1;
+  if(f<s)return -1;
+  return 0;
+}
 int main(){
   writeFile.open("performance.dat");
-
+  int first_time;
   for(int i = 0; i<SAMPLES;i++){
-    inFile.open("pal"+to_string(i+1));
+    inFile.open("mat"+to_string(i+1));
     double total_time = 0;
 
     for(int j = 0; j<SAMPLESIZE;j++){
       double input;
-      inFile >> input;
-      total_time = total_time+input;
+      inFile >> arr[i][j];
     }
-
+    qsort(arr[i], SAMPLESIZE, sizeof(double), comp);
     inFile.close();
-    printf("avg: %f\n", total_time/SAMPLESIZE);
-    string output = to_string(i+1) + "\t" + to_string(total_time/SAMPLESIZE) + "\n";
+
+  //  printf("median: %f\n", arr[i][SAMPLESIZE/2]);
+    printf("speedup: %f\n", arr[0][SAMPLESIZE/2]/arr[i][SAMPLESIZE/2]);
+
+    string output = to_string(i+1) + "\t" + to_string(arr[0][SAMPLESIZE/2]/arr[i][SAMPLESIZE/2]) + "\n";
     writeFile<<output;
   }
 

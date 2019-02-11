@@ -4,7 +4,7 @@ gcc-8 -Wall -fopenmp your-parallel-program.c
 
 
    usage with gcc (version 4.2 or higher required):
-     gcc -O -fopenmp -o matrixSum-openmp matrixSum-openmp.c 
+     gcc -O -fopenmp -o matrixSum-openmp matrixSum-openmp.c
      ./matrixSum-openmp size numWorkers
 
 */
@@ -18,7 +18,7 @@ double start_time, end_time;
 #define MAXWORKERS 8   /* maximum number of workers */
 
 int numWorkers;
-int size; 
+int size;
 int matrix[MAXSIZE][MAXSIZE];
 void *Worker(void *);
 
@@ -58,4 +58,3 @@ int main(int argc, char *argv[]) {
   printf("it took %g seconds\n", end_time - start_time);
 
 }
-

@@ -12,7 +12,7 @@
 #include <cstdio>
 #include <cctype>
 #include <cmath>
-#define SAMPLESIZE 100
+#define SAMPLESIZE 10
 #define SAMPLES 10
 
 using namespace std;
@@ -29,7 +29,7 @@ int comp (const void *e1, const void *e2){
 }
 int main(){
   writeFile.open("performance.dat");
-
+  int first_time;
   for(int i = 0; i<SAMPLES;i++){
     inFile.open("pal"+to_string(i+1));
     double total_time = 0;
@@ -40,8 +40,11 @@ int main(){
     }
     qsort(arr[i], SAMPLESIZE, sizeof(double), comp);
     inFile.close();
-    printf("median: %f\n", arr[i][SAMPLESIZE/2]);
-    string output = to_string(i+1) + "\t" + to_string(arr[i][SAMPLESIZE/2]) + "\n";
+
+  //  printf("median: %f\n", arr[i][SAMPLESIZE/2]);
+    printf("speedup: %f\n", arr[0][SAMPLESIZE/2]/arr[i][SAMPLESIZE/2]);
+
+    string output = to_string(i+1) + "\t" + to_string(arr[0][SAMPLESIZE/2]/arr[i][SAMPLESIZE/2]) + "\n";
     writeFile<<output;
   }
 

@@ -42,58 +42,69 @@ int main(int argc, char *argv[]) {
   numWorkers = (argc > 2)? atoi(argv[2]) : MAXWORKERS;
   if (size > MAXSIZE) size = MAXSIZE;
   if (numWorkers > MAXWORKERS) numWorkers = MAXWORKERS;
-  struct worker data; /* partial data for min and max values */
+  struct worker data[numWorkers]; /* partial data for min and max values */
+  int sums[numWorkers]; /* partial sums */
 
-    data.max=INT_MIN;
-    data.min=INT_MAX;
+  for(int k=0;k<numWorkers;k++){ /* Init all min and max values */
+    data[k].max=INT_MIN;
+    data[k].min=INT_MAX;
+  }
 
   omp_set_num_threads(numWorkers);
 
   /* initialize the matrix */
   for (i = 0; i < size; i++) {
-     printf("[ ");
+     //printf("[ ");
 	  for (j = 0; j < size; j++) {
       matrix[i][j] = rand()%99;
-      	  printf(" %d", matrix[i][j]);
+      //	  printf(" %d", matrix[i][j]);
 	  }
-	  	  printf(" ]\n");
+	  //	  printf(" ]\n");
   }
-  omp_init_lock(&maxlock);
-  omp_init_lock(&minlock);
+  int myid;
   start_time = omp_get_wtime();
-#pragma omp parallel for reduction (+:total) private(j)
-  for (i = 0; i < size; i++)
+#pragma omp parallel for reduction (+:total) private(j,myid)
+  for (i = 0; i < size; i++){
+    myid = omp_get_thread_num();
     for (j = 0; j < size; j++){
-     omp_set_lock(&maxlock);
-    //#pragma omp critical(max)
-     {
-      if(matrix[i][j]>data.max){
-        data.max = matrix[i][j];
-        data.maxPos[0] = i;
-        data.maxPos[1] = j;
-      }
-    }
-      omp_unset_lock(&maxlock);
-      omp_set_lock(&minlock);
-    //#pragma omp critical(min)
-    {
-      if(matrix[i][j]<data.min){
-        data.min = matrix[i][j];
-        data.minPos[0] = i;
-        data.minPos[1] = j;
-      }
-    }
-      omp_unset_lock(&minlock);
+     if(matrix[i][j]>data[myid].max){
+       data[myid].max = matrix[i][j];
+       data[myid].maxPos[0] = i;
+       data[myid].maxPos[1] = j;
+     }
+     if(matrix[i][j]<data[myid].min){
+       data[myid].min = matrix[i][j];
+       data[myid].minPos[0] = i;
+       data[myid].minPos[1] = j;
+     }
       total += matrix[i][j];
     }
+  }
 // implicit barrier
 
   end_time = omp_get_wtime();
+  struct worker final;
 
-  printf("minimum %d at (%d,%d)\n", data.min,data.minPos[1]+1,data.minPos[0]+1);
-  printf("max is %d at (%d,%d)\n", data.max,data.maxPos[1]+1,data.maxPos[0]+1);
+    final = data[0];
+    for (i = 0; i < numWorkers; i++){
+      if(final.max < data[i].max){
+        final.max = data[i].max;
+        final.maxPos[0] = data[i].maxPos[0];
+        final.maxPos[1] = data[i].maxPos[1];
+      }
+      if(final.min > data[i].min){
+        final.min = data[i].min;
+        final.minPos[0] = data[i].minPos[0];
+        final.minPos[1] = data[i].minPos[1];
+      }
+    }
 
-  printf("the total is %d\n", total);
-  printf("it took %g seconds\n", end_time - start_time);
+    //Performance Evaluation
+    printf("%f\n", end_time - start_time);
+//NORMAL OUTPUT
+    //printf("The total is %d\n", total);
+    //printf("The max is %d at position (%d,%d)\n", final.max, final.maxPos[1]+1,final.maxPos[0]+1);
+    //printf("The min is %d at position (%d,%d)\n", final.min, final.minPos[1]+1,final.minPos[0]+1);
+    //printf("The execution time is %g sec\n", end_time - start_time);
 
 }

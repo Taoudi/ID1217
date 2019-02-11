@@ -29,14 +29,15 @@ struct word_struct{
   string sanitized;
 };
 
+int numWords;
 int numWorkers;
 int listSize;
 int counter[MAXWORKERS];
 
 
 ofstream writeFile;
-struct word_struct words[WORDCOUNT];
 
+struct word_struct words[WORDCOUNT];
 
 double read_timer() {
     static bool initialized = false;
@@ -88,7 +89,7 @@ int binarySearch(string word, struct word_struct words[]){
   std::reverse(copy.begin(),copy.end());
   int boolean = FALSE;
   double low = 0;
-  double high = WORDCOUNT-1;
+  double high = numWords-1;
   string currentWord;
   int index;
 
@@ -131,12 +132,16 @@ int main(int argc, char *argv[]){
   if(numWorkers>MAXWORKERS){
     numWorkers=MAXWORKERS;
   }
-  listSize = WORDCOUNT/numWorkers;
+  numWords = (argc > 2)? atoi(argv[2]) : WORDCOUNT;
+  if(numWords>WORDCOUNT){
+    numWords=WORDCOUNT;
+  }
+  listSize = numWords/numWorkers;
 
   /* Loading file data onto array */
   writeFile.open("palindromes");
   inFile.open("words");
-    for (int i = 0; i < WORDCOUNT-1; i++)
+    for (int i = 0; i < numWords-1; i++)
     {
       inFile >> words[i].word;
       if(symbol(words[i].word)==TRUE){
@@ -152,7 +157,7 @@ int main(int argc, char *argv[]){
   omp_set_num_threads(numWorkers);
   double start = omp_get_wtime();
   #pragma omp parallel for //reduction (+:total)
-  for(i = 0; i<WORDCOUNT;i++){
+  for(i = 0; i<numWords-1;i++){
     if(palindromic(words[i].word)==TRUE){
     //  printf("ONE WORD: %s, %d\n ",words[i].c_str(),myid);
       //total++;
@@ -172,7 +177,7 @@ int main(int argc, char *argv[]){
   }
 
   total = 0;
-  for(int i = 0; i<WORDCOUNT-1;i++){
+  for(int i = 0; i<numWords-1;i++){
     if(words[i].palindrome){
      //printf("%s\n",words[i].word.c_str());
       total++;

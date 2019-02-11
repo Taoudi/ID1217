@@ -51,21 +51,22 @@ int main(int argc, char *argv[]) {
 
   /* initialize the matrix */
   for (i = 0; i < size; i++) {
-     printf("[ ");
+    // printf("[ ");
 	  for (j = 0; j < size; j++) {
       matrix[i][j] = rand()%99;
-      	  printf(" %d", matrix[i][j]);
+      	  //printf(" %d", matrix[i][j]);
 	  }
-	  	  printf(" ]\n");
+	  	 // printf(" ]\n");
   }
   omp_init_lock(&maxlock);
   omp_init_lock(&minlock);
   start_time = omp_get_wtime();
+
 #pragma omp parallel for reduction (+:total) private(j)
   for (i = 0; i < size; i++)
     for (j = 0; j < size; j++){
-     omp_set_lock(&maxlock);
-    //#pragma omp critical(max)
+     //omp_set_lock(&maxlock);
+    #pragma omp critical(max)
      {
       if(matrix[i][j]>data.max){
         data.max = matrix[i][j];
@@ -73,9 +74,9 @@ int main(int argc, char *argv[]) {
         data.maxPos[1] = j;
       }
     }
-      omp_unset_lock(&maxlock);
-      omp_set_lock(&minlock);
-    //#pragma omp critical(min)
+      //omp_unset_lock(&maxlock);
+      //omp_set_lock(&minlock);
+    #pragma omp critical(min)
     {
       if(matrix[i][j]<data.min){
         data.min = matrix[i][j];
@@ -83,17 +84,25 @@ int main(int argc, char *argv[]) {
         data.minPos[1] = j;
       }
     }
-      omp_unset_lock(&minlock);
+      //omp_unset_lock(&minlock);
       total += matrix[i][j];
     }
+
 // implicit barrier
 
   end_time = omp_get_wtime();
 
-  printf("minimum %d at (%d,%d)\n", data.min,data.minPos[1]+1,data.minPos[0]+1);
-  printf("max is %d at (%d,%d)\n", data.max,data.maxPos[1]+1,data.maxPos[0]+1);
+  #pragma omp master
+  {
+    //Performance Evaluation
+    printf("%f\n", end_time - start_time);
 
-  printf("the total is %d\n", total);
-  printf("it took %g seconds\n", end_time - start_time);
+
+  // NORMAL PRINT
+  /*  printf("minimum %d at (%d,%d)\n", data.min,data.minPos[1]+1,data.minPos[0]+1);
+    printf("max is %d at (%d,%d)\n", data.max,data.maxPos[1]+1,data.maxPos[0]+1);
+    printf("the total is %d\n", total);
+    printf("it took %g seconds\n", end_time - start_time);*/
+}
 
 }
