@@ -6,12 +6,14 @@
 #include <sys/time.h>
 #include <limits.h>
 #include <string>
+#include <algorithm>
 #include <iostream>
 #include <fstream>
 #include <cstring>
 #include <cstdio>
 #include <cctype>
 #include <cmath>
+
 using namespace std;
 
 #define WORDCOUNT 25143
@@ -84,7 +86,7 @@ int palindromic(string word){
 
 int binarySearch(string word, struct word_struct words[]){
   string copy = word;
-  reverse(copy.begin(),copy.end());
+  std::reverse(copy.begin(),copy.end());
   int boolean = FALSE;
   double low = 0;
   double high = WORDCOUNT-1;
