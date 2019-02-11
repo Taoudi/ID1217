@@ -174,13 +174,16 @@ int main(int argc, char *argv[]){
   total = 0;
   for(int i = 0; i<WORDCOUNT-1;i++){
     if(words[i].palindrome){
-     printf("%s\n",words[i].word.c_str());
+     //printf("%s\n",words[i].word.c_str());
       total++;
       writeFile << words[i].word+"\n";
     }
   }
-  printf("TOTAL: %d\n", total);
-  printf("Execution time: %f sec\n", end-start);
-  printf("DONE\n");
 
+  //USE THIS FOR BASH SCRIPT
+  printf("%f\n", end-start);
+
+  //USE THIS FOR NORMAL OUTPUT
+  //printf("TOTAL: %d\n", total);
+  //printf("Execution time: %f sec\n", end-start);
 }
