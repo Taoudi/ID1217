@@ -156,7 +156,7 @@ int main(int argc, char *argv[]){
 
   omp_set_num_threads(numWorkers);
   double start = omp_get_wtime();
-  #pragma omp parallel for //reduction (+:total)
+#pragma omp parallel for //reduction (+:total)
   for(i = 0; i<numWords-1;i++){
     if(palindromic(words[i].word)==TRUE){
     //  printf("ONE WORD: %s, %d\n ",words[i].c_str(),myid);
