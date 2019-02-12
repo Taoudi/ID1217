@@ -1,3 +1,4 @@
+# To run benchmark test
 g++-8 -fopenmp palindromes.c -o pal -O2
 g++ performanceAnalyser.c -o pa
 for((i=1;i<=10;i++))
