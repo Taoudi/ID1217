@@ -1,7 +1,7 @@
 set terminal png
 set output "performance.png"
 
-set title "Performance for Palindromes size 21453"
+set title "Performance for Palindromes size 5000"
 
 set key right center
 
@@ -9,4 +9,4 @@ set xlabel "Amount of Threads"
 set ylabel "Time in seconds"
 
 
-plot "performance.dat" u 1:2 w linespoints title "Speedup Time per amount of workers"
+plot "performance0.dat" u 1:2 w linespoints title "Speedup Time per amount of workers"

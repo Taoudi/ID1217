@@ -1,4 +1,4 @@
-gcc-8 -fopenmp reductionMatrix.c -o mat
+gcc-8 -fopenmp lockMatrix.c -o mat
 g++ performanceAnalyser.c -o pa
 for((i=1;i<=8;i++))
 do

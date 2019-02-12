@@ -1,7 +1,7 @@
 set terminal png
 set output "performance.png"
 
-set title "Performance for Palindromes size 21453"
+set title "Performance for Palindromes"
 
 set key right bottom
 

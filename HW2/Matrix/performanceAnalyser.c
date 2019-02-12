@@ -27,9 +27,9 @@ int comp (const void *e1, const void *e2){
   if(f<s)return -1;
   return 0;
 }
-int main(){
-  writeFile.open("performance.dat");
-  int first_time;
+int main(int argc, char *argv[]){
+  int id = (argc > 1)? atoi(argv[1]) : 0;
+  writeFile.open("performance" + to_string(id) + ".dat");
   for(int i = 0; i<SAMPLES;i++){
     inFile.open("mat"+to_string(i+1));
     double total_time = 0;
