@@ -65,7 +65,8 @@ int main(int argc, char *argv[]) {
 #pragma omp parallel for reduction (+:total) private(j)
   for (i = 0; i < size; i++)
     for (j = 0; j < size; j++){
-     //omp_set_lock(&maxlock);
+     //omp_set_lock(&maxlock)
+     if(matrix[i][j]>data.max){
     #pragma omp critical(max)
      {
       if(matrix[i][j]>data.max){
@@ -74,8 +75,10 @@ int main(int argc, char *argv[]) {
         data.maxPos[1] = j;
       }
     }
+  }
       //omp_unset_lock(&maxlock);
       //omp_set_lock(&minlock);
+        if(matrix[i][j]<data.min){
     #pragma omp critical(min)
     {
       if(matrix[i][j]<data.min){
@@ -84,6 +87,7 @@ int main(int argc, char *argv[]) {
         data.minPos[1] = j;
       }
     }
+  }
       //omp_unset_lock(&minlock);
       total += matrix[i][j];
     }

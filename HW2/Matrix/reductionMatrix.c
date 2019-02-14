@@ -107,8 +107,7 @@ int main(int argc, char *argv[]) {
 
   end_time = omp_get_wtime();
 
-  #pragma omp master
-  {
+
     //Performance Evaluation
     printf("%f\n", end_time - start_time);
 
@@ -119,6 +118,4 @@ int main(int argc, char *argv[]) {
     printf("the total is %d\n", total);
     printf("it took %g seconds\n", end_time - start_time);
     */
-}
-
 }
