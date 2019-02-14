@@ -1,5 +1,5 @@
 # To run benchmark test
-gcc-8 -fopenmp reductionMatrix.c -o mat
+gcc-8 -fopenmp lockMatrix.c -o mat
 g++ performanceAnalyser.c -o pa
 
 for((k=10;k<7700;k=k+2500))
