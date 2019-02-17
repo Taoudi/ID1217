@@ -1,0 +1,3 @@
+scp ./$1 yousseft@avril.sys.ict.kth.se:~/ID1217/HW3/$1
+ssh yousseft@avril.sys.ict.kth.se
+cd ~/ID1217/HW3
