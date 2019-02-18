@@ -19,7 +19,7 @@
 void *Producer(void *);  /* the two threads */
 void *Consumer(void *);
 
-sem_t empty, full, lock;    /* the global semaphores */
+sem_t parent, baby, chirp;    /* the global semaphores */
 int food;
 int amtFood;       /* shared buffer         */
 int numIters;
@@ -48,9 +48,9 @@ int main(int argc, char *argv[]) {
   pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM);
   pthread_mutex_init(&printLock, NULL);
 
-  sem_init(&empty, SHARED, 0);  /* sem empty = 1 */
-  sem_init(&full, SHARED, 1);   /* sem full = 0  */
-  sem_init(&lock, SHARED, 1);   /* sem full = 0  */
+  sem_init(&parent, SHARED, 0);  /* sem empty = 1 */
+  sem_init(&baby, SHARED, 1);   /* sem full = 0  */
+  sem_init(&chirp, SHARED, 0);   /* sem full = 0  */
 
   printf("main started\n");
   for(long l = 0; l<numBirds;l++){
@@ -72,12 +72,11 @@ void *Producer(void *arg) {
 
 //  printf("Producer created\n");
   while(1) {
-      sem_wait(&empty);
-      sem_wait(&lock);
-        food=amtFood;
-        printf("Parent produces food!, %d LEFT\n",food);
-        sem_post(&full);
-      sem_post(&lock);
+      sem_wait(&chirp);
+      food=amtFood;
+      printf("Parent produces food!, %d LEFT\n",food);
+      sem_post(&parent);
+      sleep(1);
   }
 }
 
@@ -86,19 +85,16 @@ void *Consumer(void *arg) {
   long myid = (long) arg;
 //  printf("Consumer created %d\n",myid);
   while(1) {
-    sem_wait(&full);
-    sem_wait(&lock);
-    if(food>0){
+    sem_wait(&baby);
+    if(food==0){
+      printf("BIRD %d CHIRPS!\n",myid, food);
+      sem_post(&chirp);
+      sem_wait(&parent);
+    }
       food--;
       printf("BIRD %d EATS! %d LEFT\n",myid,food);
-      sem_post(&full);
-    }
-    else if(food==0){
-      printf("BIRD %d CHIRPS!\n",myid, food);
-      sem_post(&empty);
-    }
+      sem_post(&baby);
     sleep(1);
-    sem_post(&lock);
   }
 //  printf("for %d iterations, the total is %d\n", numIters, total);
 }

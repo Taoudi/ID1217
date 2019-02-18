@@ -19,7 +19,7 @@
 void *Producer(void *);  /* the two threads */
 void *Consumer(void *);
 
-sem_t empty, full, honeypotLock;    /* the global semaphores */
+sem_t fillPot, eat, honeypotLock;    /* the global semaphores */
 int honeypot;
 int honeyAmount;       /* shared buffer         */
 int numIters;
@@ -47,16 +47,16 @@ int main(int argc, char *argv[]) {
   pthread_attr_init(&attr);
   pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM);
 
-  sem_init(&empty, SHARED, 1);  /* sem empty = 1 */
-  sem_init(&full, SHARED, 0);   /* sem full = 0  */
-  sem_init(&honeypotLock, SHARED, 1);   /* sem full = 0  */
+  sem_init(&fillPot, SHARED, 1);  /* sem fillPot = 1 */
+  sem_init(&eat, SHARED, 0);   /* sem eat = 0  */
+  sem_init(&honeypotLock, SHARED, 1);   /* sem eat = 0  */
 
   printf("main started\n");
   for(long l = 0; l<numBees;l++){
     pthread_create(&bees[l],&attr,Producer, (void *) l);
   }
   pthread_create(&bear, &attr, Consumer, NULL);
-  //sem_post(&full);
+  //sem_post(&eat);
   //printf("SEND SIGNAL\n");
   for(int i = 0; i<numBees;i++){
     pthread_join(bees[i], NULL);
@@ -71,18 +71,16 @@ void *Producer(void *arg) {
   long myid = (long) arg;
 //  printf("Producer created\n");
   while(1) {
-    sem_wait(&empty);
-    sem_wait(&honeypotLock);
-      printf("Bee nr %d FILLS UP POT to %d !\n", myid,honeypot+1);
-      honeypot++;
-      if(honeypot==honeyAmount){
-        printf("Bee nr %d WAKES UP BEAR!\n",myid);
-        sem_post(&full);
-      }
-      else
-        sem_post(&empty);
+    sem_wait(&fillPot);
+    printf("Bee nr %d FILLS UP POT to %d !\n", myid,honeypot+1);
+    honeypot++;
+    if(honeypot==honeyAmount){
+      printf("Bee nr %d WAKES UP BEAR!\n",myid);
+      sem_post(&eat);
+    }
+    else
+      sem_post(&fillPot);
     sleep(1);
-    sem_post(&honeypotLock);
   }
 }
 
@@ -90,11 +88,10 @@ void *Producer(void *arg) {
 void *Consumer(void *arg) {
 //  printf("Consumer created %d\n");
   while(1) {
-    sem_wait(&full);
-    sem_wait(&honeypotLock);
+    sem_wait(&eat);
     printf("BEAR EATS HONEY\n");
     honeypot=0;
-    sem_post(&empty);
-    sem_post(&honeypotLock);
+    sem_post(&fillPot);
+    sleep(1);
     }
   }
