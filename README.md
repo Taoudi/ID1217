@@ -15,3 +15,8 @@ Two variations of producer consumer
 - [x] Hungry Birds Problem
 - [x] Honeybees and Bear Problem
 
+### Homework 4 - Monitors
+Two variations of producer consumer
+- [x] Hungry Birds Problem
+- [x] Honeybees and Bear Problem
+
