@@ -13,6 +13,7 @@ private:
   pthread_cond_t notEmpty;
   pthread_cond_t isEmpty;
   pthread_cond_t eat;
+  int go;
 public:
   void init(int max){
     pthread_mutex_init(&nestLock, NULL);
@@ -24,25 +25,32 @@ public:
   }
   void start(){
     pthread_cond_signal(&notEmpty);
+    go = 1;
   }
   void produce(){
     pthread_cond_wait(&isEmpty,&nestLock);
     worms = maxworms;
     printf("Parent fills nest \n");
     pthread_cond_signal(&eat);
-    //sleep(1);
+    sleep(1);
   }
   void consume(long id){
+  pthread_mutex_lock(&nestLock);
+  while(go==0){
     pthread_cond_wait(&notEmpty,&nestLock);
-    if(worms==0){
-      pthread_cond_signal(&isEmpty);
-      printf("CHIRP!!!\n");
-      pthread_cond_wait(&eat,&nestLock);
-    }
-    worms--;
-    printf("Bird nr %d eats, %d worms left\n",id,worms);
-    pthread_cond_signal(&notEmpty);
-  //  sleep(1);
+  }
+  go=0;
+  if(worms==0){
+    pthread_cond_signal(&isEmpty);
+    printf("Bird %d CHIRPS!\n",id);
+    pthread_cond_wait(&eat,&nestLock);
+  }
+  worms--;
+  printf("Bird %d eats, %d left!\n",id,worms);
+  go=1;
+  pthread_cond_signal(&notEmpty);
+  pthread_mutex_unlock(&nestLock);
+  sleep(1);
   }
 };
 
@@ -72,10 +80,10 @@ int main(int argc, char *argv[]){
   pthread_t children[threads];
   printf("main started\n");
   for(long l = 0; l<threads;l++){
-    printf("Bee nr %d created\n",l);
+    printf("baby nr %d created\n",l);
     pthread_create(&children[l],&attr,Consumer, (void *) l);
   }
-  printf("Bear  created\n");
+  printf("parent  created\n");
   pthread_create(&parent, &attr, Producer, NULL);
   //sem_post(&eat);
   //printf("SEND SIGNAL\n");
