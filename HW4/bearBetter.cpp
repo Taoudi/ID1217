@@ -22,20 +22,18 @@ public:
     maxpot = max;
     honeypot = 0;
     prod=1;
-    eat=0;
   }
 
   void produce(long id){
     pthread_mutex_lock(&honeypotLock);
-    while(prod==0){
+    while(!prod){
       pthread_cond_wait(&notFull,&honeypotLock);
     }
-    prod=0;
     honeypot++;
     printf("Bee nr %d FILLS UP POT to %d !\n",id,honeypot);
     if(honeypot==maxpot){
       printf("Bee %d WAKES UP BEAR!\n",id);
-      eat=1;
+      prod = 0;
       pthread_cond_signal(&isFull);
     }
     else{
@@ -48,19 +46,17 @@ public:
 
 
   void consume(){
-    //pthread_mutex_lock(&honeypotLock);
-    while(eat==0){
+    pthread_mutex_lock(&honeypotLock);
+    while(prod){
       pthread_cond_wait(&isFull,&honeypotLock);
     }
     printf("BEAR EATS HONEY\n");
     honeypot=0;
-    eat=0;
     prod=1;
     pthread_cond_signal(&notFull);
     pthread_mutex_unlock(&honeypotLock);
     sleep(1);
   }
-
 };
 
 

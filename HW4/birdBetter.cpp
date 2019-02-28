@@ -23,17 +23,16 @@ public:
     pthread_cond_init(&eat, NULL);
     maxworms = max;
     worms = max;
-    go = 1;
+    //go = 1;
     prod=0;
   }
 
   void produce(){
-    //pthread_mutex_lock(&nestLock);
-    while(prod==0){
+    pthread_mutex_lock(&nestLock);
+    while(!prod){
       pthread_cond_wait(&parentCond,&nestLock);
     }
     worms = maxworms;
-    prod=0;
     printf("Parent fills nest \n");
     pthread_cond_signal(&eat);
     pthread_mutex_unlock(&nestLock);
@@ -43,21 +42,18 @@ public:
 
   void consume(long id){
     pthread_mutex_lock(&nestLock);
-    while(go==0){
+    while(prod){
       pthread_cond_wait(&babyCond,&nestLock);
     }
-    go=0;
-
     if(worms==0){
       prod=1;
       pthread_cond_signal(&parentCond);
       printf("Bird %d CHIRPS!\n",id);
       pthread_cond_wait(&eat,&nestLock);
     }
-
     worms--;
     printf("Bird %d eats, %d left!\n",id,worms);
-    go=1;
+    prod=0;
     pthread_cond_signal(&babyCond);
     pthread_mutex_unlock(&nestLock);
     sleep(1);
