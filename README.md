@@ -20,3 +20,7 @@ Two variations of producer consumer
 - [x] Hungry Birds Problem
 - [x] Honeybees and Bear Problem
 
+### Project - Green Elevator
+Implementation of elevator controller.
+- [x] Synchronization, Locking all RMI methods and synchronization between events, elevator threads and event threads.
+- [x] Cost Algorithm, Pick up people that are waiting inbetween target floor and current position of elevator if they are going the same way as the elevator.
