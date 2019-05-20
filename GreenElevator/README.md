@@ -1,6 +1,6 @@
 # Project for course ID1217 at KTH - Kevin Ammouri, Youssef Taoudi
 
-## To run the program, execute bash scripts with arguments below.
+## To run the program, execute bash scripts with parameters displayed below.
 ### First:
 Run java.sh [elevator] [floors]
 
